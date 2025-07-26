@@ -1,13 +1,28 @@
-FROM node:20-alpine
-
+# ---------- Build Stage ----------
+FROM node:20-alpine AS build
 WORKDIR /app
 
+# Install dependencies
 COPY package*.json ./
+RUN npm ci
 
-RUN npm install
-
+# Copy source code
 COPY . .
 
-EXPOSE 5173
+# Build the app
+RUN npm run build
 
-CMD ["npm", "run", "dev"]
+# ---------- Production Stage ----------
+FROM nginx:alpine
+
+# Remove default nginx web files
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built Vite files to nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Run nginx
+CMD ["nginx", "-g", "daemon off;"]
