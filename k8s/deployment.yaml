@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f1-app
+  template:
+    metadata:
+      labels:
+        app: f1-app
+    spec:
+      containers:
+      - name: f1-container
+        image: <your-dockerhub-username>/f1-streetwear
+        ports:
+        - containerPort: 80
